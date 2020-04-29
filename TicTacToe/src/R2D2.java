@@ -11,15 +11,15 @@ import org.json.simple.parser.ParseException;
 
 public class R2D2 extends Player{
 	
-	int previousGameHash;
-	int currentGameHash;
+	String previousGameHash;
+	String currentGameHash;
 	
 	R2D2(Grid grid, WinRules wr, String symbol, String path){
 		super(grid,symbol,wr,path);
 	
 	}
 
-	public void play(int previousGameHash,int currentGameHash) {
+	public void play(String previousGameHash,String currentGameHash) {
 		
 		turns_taken++;
 		this.previousGameHash = previousGameHash;
@@ -79,6 +79,16 @@ public class R2D2 extends Player{
 				//check children and if if any children are L set result to L, then T and then W. L>T>W
 			//If results is L, choose a different position
 			
+			try {
+				savingStates.addChildrenToCurrentFile(grid,future_grid);
+				//savingStates.setStatusOfChildToFutureResult(grid,future_grid);
+		        
+			} catch (IOException | ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			//add future state reference to child
 //			try {
 //				savingStates.checkChildrenUpdateResult();
 //			} catch (IOException | ParseException e) {

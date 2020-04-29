@@ -26,7 +26,7 @@ public class SavingStates{
 	
 	public void createCurrentGridStateJSON() throws ParseException, IOException {
 		
-		File file = new File(path, Integer.toString(grid.getGridHashCode()) + ".json");
+		File file = new File(path, grid.getGridHashCode() + ".json");
         boolean exists = file.exists();
         //System.out.println("exits:" + exists);
         
@@ -120,7 +120,7 @@ public class SavingStates{
 	
 	public boolean checkIfFutureStateExists(Grid future_grid) {
 		
-		File future_file = new File(path, Integer.toString(future_grid.getGridCopy().getGridHashCode()) + ".json");
+		File future_file = new File(path, future_grid.getGridCopy().getGridHashCode() + ".json");
 
         boolean exists = future_file.exists();
 
@@ -129,11 +129,10 @@ public class SavingStates{
 	
 	public void addChildrenToCurrentFile(Grid current_grid, Grid future_grid) throws IOException, ParseException {
 		
-		System.out.println("ADDING CHILDREN");
 		//instead of undetermined, set hashcode value to future result value
 		FileReader fileReader;
 
-		File file = new File(path, Integer.toString(current_grid.getGridCopy().getGridHashCode()) + ".json");
+		File file = new File(path, current_grid.getGridCopy().getGridHashCode() + ".json");
 
 		fileReader = new FileReader(file);
 		JSONParser parser = new JSONParser();
@@ -141,13 +140,13 @@ public class SavingStates{
 		
 		JSONObject obj = (JSONObject) parser.parse(fileReader);
 		
-		System.out.println((obj.get("children")).getClass().getName());
+		//System.out.println((obj.get("children")).getClass().getName());
         
-		JSONObject children = keepDataTypeConsistant(obj.get("children")); 
+		JSONObject children = (JSONObject) obj.get("children"); 
 
         WinRules future_result = new WinRules(future_grid);
         
-        System.out.println("future: " + future_result.checkGrid());
+        //System.out.println("future: " + future_result.checkGrid());
         
         if(future_result.checkGrid().equals("")) {
             children.put(future_grid.getGridCopy().getGridHashCode(), "undetermined");
@@ -167,16 +166,11 @@ public class SavingStates{
         fileReader.close();
 	}
 	
-	public static JSONObject keepDataTypeConsistant(Object object) {
-		
-		System.out.println("JSONObject: "+ object);
-		return (JSONObject) object;
-		
-	}
+
 	
 	public void checkChildrenUpdateResult() throws IOException, ParseException {
 		
-		File file = new File(path, Integer.toString(grid.getGridCopy().getGridHashCode()) + ".json");
+		File file = new File(path, grid.getGridCopy().getGridHashCode() + ".json");
 		
 		FileReader fileReader = new FileReader(file);
 		

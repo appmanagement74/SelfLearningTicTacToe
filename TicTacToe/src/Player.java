@@ -19,7 +19,7 @@ public abstract class Player {
 		opponentSymbol = getOpponentSymbol();
 	}
 	
-	public abstract void play(int previousGameHash,int currentGameHash);
+	public abstract void play(String previousGameHash,String currentGameHash);
 	
 	public String getOpponentSymbol() {
 		

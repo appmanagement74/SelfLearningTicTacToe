@@ -1,4 +1,8 @@
 import java.util.Arrays;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 public class Grid {
@@ -90,11 +94,57 @@ public class Grid {
 		return default_value;
 	}
 	
-	public int getGridHashCode() {
+	public String gameGridToString() {
 		
-		int hash_code1 = Arrays.deepHashCode(game_grid);
-		return hash_code1;
+		String string_grid = "";
+		
+		for(int i = 0; i < row_amt; i++) {
+			for(int j = 0; j < col_amt; j++) {
+				string_grid += game_grid[i][j];
+			}
+		}
+		
+		return string_grid;
+		
 	}
+	
+	public String getGridHashCode() {
+	
+		try {
+			return toHexString(getSHA(gameGridToString()));
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ""; 
+	}
+	
+	public static byte[] getSHA(String input) throws NoSuchAlgorithmException 
+    {  
+        // Static getInstance method is called with hashing SHA  
+        MessageDigest md = MessageDigest.getInstance("SHA-256");  
+  
+        // digest() method called  
+        // to calculate message digest of an input  
+        // and return array of byte 
+        return md.digest(input.getBytes(StandardCharsets.UTF_8));  
+    } 
+	public static String toHexString(byte[] hash) 
+    { 
+        // Convert byte array into signum representation  
+        BigInteger number = new BigInteger(1, hash);  
+  
+        // Convert message digest into hex value  
+        StringBuilder hexString = new StringBuilder(number.toString(16));  
+  
+        // Pad with leading zeros 
+        while (hexString.length() < 32)  
+        {  
+            hexString.insert(0, '0');  
+        }  
+  
+        return hexString.toString();  
+    } 
 	
 	public Grid getGridCopy() {
 		

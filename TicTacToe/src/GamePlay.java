@@ -9,8 +9,8 @@ public class GamePlay {
 	private Scanner sc;
 	private WinRules wr;
 	
-	private int previousGameHash;
-	private int currentGameHash;
+	private String previousGameHash;
+	private String currentGameHash;
 	private String path;
 	private String x = "X";
 	private String o = "O";

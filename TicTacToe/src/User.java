@@ -14,7 +14,7 @@ public class User extends Player{
 	}
 	
 	@Override
-	public void play(int previousGameHash,int currentGameHash){
+	public void play(String previousGameHash, String currentGameHash){
 			getValidInput();
 			turns_taken++;
 	}
