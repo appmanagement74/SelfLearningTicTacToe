@@ -17,7 +17,16 @@ public class SavingStates{
 	private Grid grid;
     private WinRules wr;
     private String path;
+    private static int rand_avail_pos;
     private double default_percent = 0.0;
+	
+	SavingStates(Grid grid, WinRules wr,String path, int rand_avail_pos){
+		
+		this.grid = grid;
+		this.wr = wr;
+		this.path = path;
+		this.rand_avail_pos = rand_avail_pos;
+	}
 	
 	SavingStates(Grid grid, WinRules wr,String path){
 		
@@ -94,8 +103,9 @@ public class SavingStates{
 		gameState.put("r3c2",grid.getGrid()[2][1]);
 		gameState.put("r3c3",grid.getGrid()[2][2]);
 		gameState.put("stateOccurenceCounter", 1);
+		gameState.put("Randomly chosen grid location", rand_avail_pos);
 
-		
+
 		String string_grid = grid.getGrid()[0][0] + "," + grid.getGrid()[0][1] + "," + grid.getGrid()[0][2] + "\n" + 
 							 grid.getGrid()[1][0] + "," + grid.getGrid()[1][1] + "," + grid.getGrid()[1][2] + "\n" +
 							 grid.getGrid()[2][0] + "," + grid.getGrid()[2][1] + "," + grid.getGrid()[2][2];
@@ -196,6 +206,8 @@ public class SavingStates{
 				child.put("win_percentage_for_player_O", 0.0);
 				child.put("tie_percentage", 100.0);
 			}
+        	//child.put("Randomly chosen grid location", -1);
+
             children.put(future_grid.getGridCopy().getGridHashCode(), child);
         }
         
@@ -224,6 +236,11 @@ public class SavingStates{
 		Double parent_tie_percentage = 0.0;
 
 		int counter = 0;
+		
+		double win_x_max = 0;
+		double win_o_max = 0;
+		double tie_max = 0;
+		
 		for(String child_key: all_children_keys) {
 			//need to access result values for each child
 		
@@ -237,17 +254,19 @@ public class SavingStates{
 				
 				counter++;
 				
-				Double winX = (double) child_value.get("win_percentage_for_player_X");
-				Double winO = (double) child_value.get("win_percentage_for_player_O");
+				Double win_x = (double) child_value.get("win_percentage_for_player_X");
+				Double win_o = (double) child_value.get("win_percentage_for_player_O");
 				Double tie = (double) child_value.get("tie_percentage");
 
+				win_x_max = Math.max(win_x_max,win_x);
+				win_o_max = Math.max(win_o_max,win_o);
+				tie_max = Math.max(tie_max, tie);
 
-				parent_win_percentage_for_player_X += winX;
-				parent_win_percentage_for_player_O += winO;
+				parent_win_percentage_for_player_X += win_x;
+				parent_win_percentage_for_player_O += win_o;
 				parent_tie_percentage += tie;
 				
 			}
-			
 		}
 		
 		parent_win_percentage_for_player_X = parent_win_percentage_for_player_X/counter;
@@ -257,6 +276,11 @@ public class SavingStates{
 		obj.put("win_percentage_for_player_X",parent_win_percentage_for_player_X);
 		obj.put("win_percentage_for_player_O",parent_win_percentage_for_player_O);
 		obj.put("tie_percentage",parent_tie_percentage);
+		
+		
+		obj.put("MAX win_percentage_for_player_X",win_x_max);
+		obj.put("MAX win_percentage_for_player_O",win_o_max);
+		obj.put("MAX tie_percentage",tie_max);
 	}
 	
 	public void updateChildrenResults(Grid current_grid, Grid future_grid) throws IOException, ParseException {
@@ -296,13 +320,13 @@ public class SavingStates{
         	child.put("win_percentage_for_player_X", obj2.get("win_percentage_for_player_X"));
     		child.put("win_percentage_for_player_O", obj2.get("win_percentage_for_player_O"));
     		child.put("tie_percentage", obj2.get("tie_percentage"));
+            child.put("Randomly chosen grid location", obj2.get("Randomly chosen grid location"));
+
         	
         }
-    	
-
-    
+        
 		
-		children.put(future_hash,child);
+        children.put(future_hash,child);
         obj.put("children", children);
         
         updateResult(obj);
@@ -318,11 +342,8 @@ public class SavingStates{
         
         fileReader.close();
         fileReader2.close();
-
-		
 	}
 		
-
 	public void checkChildrenUpdateResult() throws IOException, ParseException {
 		
 		File file = new File(path, grid.getGridCopy().getGridHashCode() + ".json");

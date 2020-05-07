@@ -49,7 +49,7 @@ public class R2D2 extends Player{
 		
 		//check if future state file/hash exists
 		
-		SavingStates savingStates = new SavingStates(grid, wr, path);
+		SavingStates savingStates = new SavingStates(grid, wr, path, rand_avail_pos);
 		
 		boolean futureStateExists = savingStates.checkIfFutureStateExists(future_grid);
 		
@@ -88,26 +88,13 @@ public class R2D2 extends Player{
 			//If results is L, choose a different position
 			
 			
-		
-//			try {
-//				savingStates.checkChildrenUpdateResult();
-//			} catch (IOException | ParseException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
 
 		}
 		updateValueonGrid(grid, rand_avail_pos);
 
 		//set future status to current children
-		
-		
-
+	
 	}
-	
-	
-	
-	
 	
 	public void updateValueonGrid(Grid grid, int rand_avail_pos) {
 		
