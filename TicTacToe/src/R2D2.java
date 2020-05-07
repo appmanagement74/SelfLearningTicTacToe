@@ -52,25 +52,33 @@ public class R2D2 extends Player{
 		SavingStates savingStates = new SavingStates(grid, wr, path);
 		
 		boolean futureStateExists = savingStates.checkIfFutureStateExists(future_grid);
+		
 
-		if(!futureStateExists) {
-			//add future State Hash to Current State file under possibilities array
-			//     and move current State to next State
+		try {
 			
+			savingStates.addChildrenToCurrentFile(grid,future_grid);
+			//savingStates.setStatusOfChildToFutureResult(grid,future_grid);
+	        
+		} catch (IOException | ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	
+		 if(futureStateExists) {
 			
+			//update children results  to next node result field or else it be set to undetermined 
+			 
 			try {
-				
-				savingStates.addChildrenToCurrentFile(grid,future_grid);
-				//savingStates.setStatusOfChildToFutureResult(grid,future_grid);
-		        
-			} catch (IOException | ParseException e) {
+				savingStates.updateChildrenResults(grid,future_grid);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		
-			
-		}
-		else {
+			//use previous data to either allow the random value update or generate another random value.
 			//2b. If future State exist, check whether it'll lead to a win
 			//3. If future State, doesn't lead to win, check another future State
 			//4. Move to future state
@@ -79,16 +87,8 @@ public class R2D2 extends Player{
 				//check children and if if any children are L set result to L, then T and then W. L>T>W
 			//If results is L, choose a different position
 			
-			try {
-				savingStates.addChildrenToCurrentFile(grid,future_grid);
-				//savingStates.setStatusOfChildToFutureResult(grid,future_grid);
-		        
-			} catch (IOException | ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 			
-			//add future state reference to child
+		
 //			try {
 //				savingStates.checkChildrenUpdateResult();
 //			} catch (IOException | ParseException e) {

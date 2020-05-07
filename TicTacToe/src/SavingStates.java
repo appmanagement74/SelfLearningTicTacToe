@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Set;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -16,6 +17,7 @@ public class SavingStates{
 	private Grid grid;
     private WinRules wr;
     private String path;
+    private double default_percent = 0.0;
 	
 	SavingStates(Grid grid, WinRules wr,String path){
 		
@@ -103,10 +105,30 @@ public class SavingStates{
 		JSONObject children = new JSONObject();	
 		String winner = wr.checkGrid();
 		if(!winner.equals("")) {
-			gameState.put("result", winner);
+			
+			if(winner.equals("X" + wr.getWinMessage())) {
+				gameState.put("win_percentage_for_player_X", 100.0);
+				gameState.put("win_percentage_for_player_O", 0.0);
+				gameState.put("tie_percentage", 0.0);
+			}
+			else if(winner.equals("O" + wr.getWinMessage())) {
+				gameState.put("win_percentage_for_player_X", 0.0);
+				gameState.put("win_percentage_for_player_O", 100.0);
+				gameState.put("tie_percentage", 0.0);
+
+			}
+			else {
+				gameState.put("win_percentage_for_player_X", 0.0);
+				gameState.put("win_percentage_for_player_O", 0.0);
+				gameState.put("tie_percentage", 100.0);
+			}
+
 		}
 		else if(winner.equals("")){
-			gameState.put("result", "Undetermined");
+			
+//			gameState.put("win_percentage_for_player_X", default_percent);
+//			gameState.put("win_percentage_for_player_O", default_percent);
+//			gameState.put("tie_percentage", default_percent);
 		}
 		else {
 			System.out.println("ERROR in creating new node");
@@ -148,12 +170,37 @@ public class SavingStates{
         
         //System.out.println("future: " + future_result.checkGrid());
         
-        if(future_result.checkGrid().equals("")) {
-            children.put(future_grid.getGridCopy().getGridHashCode(), "undetermined");
+        JSONObject child = new JSONObject();
+    	String f_result = future_result.checkGrid();
+
+        if(f_result.equals("")) {
+//        	child.put("win_percentage_for_player_X", default_percent);
+//			child.put("win_percentage_for_player_O", default_percent);
+//			child.put("tie_percentage", default_percent);
+            children.put(future_grid.getGridCopy().getGridHashCode(), child);
         }
         else {
-            children.put(future_grid.getGridCopy().getGridHashCode(), future_result.checkGrid());
+        	if(f_result.equals("X" + wr.getWinMessage())) {
+            	child.put("win_percentage_for_player_X", 100.0);
+            	child.put("win_percentage_for_player_O", 0.0);
+            	child.put("tie_percentage", 0.0);
+			}
+			else if(f_result.equals("O" + wr.getWinMessage())) {
+				child.put("win_percentage_for_player_X", 0.0);
+				child.put("win_percentage_for_player_O", 100.0);
+				child.put("tie_percentage", 0.0);
+
+			}
+			else {
+				child.put("win_percentage_for_player_X", 0.0);
+				child.put("win_percentage_for_player_O", 0.0);
+				child.put("tie_percentage", 100.0);
+			}
+            children.put(future_grid.getGridCopy().getGridHashCode(), child);
         }
+        
+        //after new children are added, parent result status must be updated
+        updateResult(obj);
         
         obj.put("children", children);
         
@@ -166,8 +213,116 @@ public class SavingStates{
         fileReader.close();
 	}
 	
+	public void updateResult(JSONObject obj) {
+		
+		JSONObject children = (JSONObject) obj.get("children"); 
 
+		Set<String> all_children_keys = children.keySet();
+		
+		Double parent_win_percentage_for_player_X = 0.0;
+		Double parent_win_percentage_for_player_O = 0.0;
+		Double parent_tie_percentage = 0.0;
+
+		int counter = 0;
+		for(String child_key: all_children_keys) {
+			//need to access result values for each child
+		
+			
+			JSONObject child_value = (JSONObject) children.get(child_key);
+			System.out.println(child_value);
+			
+			if(child_value.get("win_percentage_for_player_X") != null 
+					&& child_value.get("win_percentage_for_player_O") != null
+					&& child_value.get("tie_percentage") != null) {
+				
+				counter++;
+				
+				Double winX = (double) child_value.get("win_percentage_for_player_X");
+				Double winO = (double) child_value.get("win_percentage_for_player_O");
+				Double tie = (double) child_value.get("tie_percentage");
+
+
+				parent_win_percentage_for_player_X += winX;
+				parent_win_percentage_for_player_O += winO;
+				parent_tie_percentage += tie;
+				
+			}
+			
+		}
+		
+		parent_win_percentage_for_player_X = parent_win_percentage_for_player_X/counter;
+		parent_win_percentage_for_player_O = parent_win_percentage_for_player_O/counter;;
+		parent_tie_percentage = parent_tie_percentage/counter;
+		
+		obj.put("win_percentage_for_player_X",parent_win_percentage_for_player_X);
+		obj.put("win_percentage_for_player_O",parent_win_percentage_for_player_O);
+		obj.put("tie_percentage",parent_tie_percentage);
+	}
 	
+	public void updateChildrenResults(Grid current_grid, Grid future_grid) throws IOException, ParseException {
+		
+		//instead of undetermined, set hashcode value to future result value
+		FileReader fileReader;
+		FileReader fileReader2;
+
+		String future_hash = future_grid.getGridCopy().getGridHashCode();
+		File file = new File(path, current_grid.getGridCopy().getGridHashCode() + ".json");
+		File file2 = new File(path, future_hash + ".json");
+
+		fileReader = new FileReader(file);
+		fileReader2 = new FileReader(file2);
+
+		JSONParser parser = new JSONParser();
+		JSONParser parser2 = new JSONParser();
+
+        
+		
+		JSONObject obj = (JSONObject) parser.parse(fileReader);
+		JSONObject obj2 = (JSONObject) parser2.parse(fileReader2);
+
+		        
+		JSONObject children = (JSONObject) obj.get("children"); 
+        
+        
+        JSONObject child = new JSONObject();
+        
+        System.out.println("children: " + obj.get("children"));
+
+        
+        if(obj2.get("win_percentage_for_player_X") != null 
+        		&&  obj2.get("win_percentage_for_player_O") != null
+        		&& obj2.get("tie_percentage") != null) {
+        	
+        	child.put("win_percentage_for_player_X", obj2.get("win_percentage_for_player_X"));
+    		child.put("win_percentage_for_player_O", obj2.get("win_percentage_for_player_O"));
+    		child.put("tie_percentage", obj2.get("tie_percentage"));
+        	
+        }
+    	
+
+    
+		
+		children.put(future_hash,child);
+        obj.put("children", children);
+        
+        updateResult(obj);
+        
+        System.out.println("children2: " + obj.get("children"));
+
+        
+        FileWriter fileWriter = new FileWriter(file);
+		fileWriter.write(obj.toString());
+		
+		fileWriter.flush();
+	    fileWriter.close();
+        
+        fileReader.close();
+        fileReader2.close();
+
+		
+	}
+		
+
 	public void checkChildrenUpdateResult() throws IOException, ParseException {
 		
 		File file = new File(path, grid.getGridCopy().getGridHashCode() + ".json");

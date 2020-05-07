@@ -20,7 +20,7 @@ public class GamePlay {
 		grid = new Grid();
 		sc = new Scanner(System.in);
 		wr = new WinRules(grid);
-		path = "/Users/salram/Desktop/TicTacToeStates/";
+		path = "/Volumes/TICTACTOE/TicTacToeStates/";
 		
 	}
 	
