@@ -122,6 +122,7 @@ public class GamePlay {
 		
 		try {
 			ss.createCurrentGridStateJSON();
+		
 		} catch (IOException | ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

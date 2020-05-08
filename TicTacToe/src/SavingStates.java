@@ -187,7 +187,10 @@ public class SavingStates{
 //        	child.put("win_percentage_for_player_X", default_percent);
 //			child.put("win_percentage_for_player_O", default_percent);
 //			child.put("tie_percentage", default_percent);
+        	
+        	child.put("Randomly chosen grid location", rand_avail_pos);//this works
             children.put(future_grid.getGridCopy().getGridHashCode(), child);
+            
         }
         else {
         	if(f_result.equals("X" + wr.getWinMessage())) {
@@ -320,10 +323,11 @@ public class SavingStates{
         	child.put("win_percentage_for_player_X", obj2.get("win_percentage_for_player_X"));
     		child.put("win_percentage_for_player_O", obj2.get("win_percentage_for_player_O"));
     		child.put("tie_percentage", obj2.get("tie_percentage"));
-            child.put("Randomly chosen grid location", obj2.get("Randomly chosen grid location"));
 
         	
         }
+        
+        child.put("Randomly chosen grid location", rand_avail_pos);
         
 		
         children.put(future_hash,child);

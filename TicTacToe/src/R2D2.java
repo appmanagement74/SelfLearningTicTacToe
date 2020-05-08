@@ -71,6 +71,7 @@ public class R2D2 extends Player{
 			 
 			try {
 				savingStates.updateChildrenResults(grid,future_grid);
+
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
