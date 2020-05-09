@@ -24,7 +24,7 @@ public class GamePlay {
 		
 	}
 	
-	public void R2D2vsPlayer() {
+	public String R2D2vsPlayer() {
 		
 
 			Player r2d2 =  new R2D2(grid,wr, x,path);
@@ -46,7 +46,7 @@ public class GamePlay {
 					System.out.println(check_grid);
 				}
 				if(wr.getGameHasEnded()) {
-					break;
+					return check_grid;
 				}
 				
 				((User) user_2).play(previousGameHash,currentGameHash);
@@ -57,14 +57,16 @@ public class GamePlay {
 					System.out.println(check_grid);
 				}
 				if(wr.getGameHasEnded()) {
-					break;
+					return check_grid;
 				}
+				
 	
 			}
 			sc.close();
+			return check_grid;
 	}
 	
-	public void R2D2vsR2D2() {
+	public String R2D2vsR2D2() {
 		
 
 		Player r2d2 =  new R2D2(grid,wr, x,path);
@@ -86,7 +88,7 @@ public class GamePlay {
 				System.out.println(check_grid);
 			}
 			if(wr.getGameHasEnded()) {
-				break;
+				return check_grid;
 			}
 			
 			((R2D2) r2d2_2).play(previousGameHash,currentGameHash);
@@ -97,11 +99,13 @@ public class GamePlay {
 				System.out.println(check_grid);
 			}
 			if(wr.getGameHasEnded()) {
-				break;
+				return check_grid;
 			}
 
 		}
 		sc.close();
+		return check_grid;
+
 }
 	
 	

@@ -13,6 +13,12 @@ public class WinRules {
 		tie_message = "Tie!";
 	}
 	
+	WinRules(){
+		game_has_ended = false;
+		win_message = " Wins!";
+		tie_message = "Tie!";
+	}
+	
 	public String checkGrid() {
 		
 		if(grid.getOpenPositionsAmt() <= 0) {

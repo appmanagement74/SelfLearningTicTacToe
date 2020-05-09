@@ -45,17 +45,55 @@ public class R2D2 extends Player{
 		Grid future_grid = grid.getGridCopy();
 
 		
-		updateValueonGrid(future_grid, rand_avail_pos);
+		int decision = calculateBestPosition();
 		
-		//check if future state file/hash exists
+		if(decision <= 0) {
+			decision = rand_avail_pos;
+			//System.out.println("***************************************Random**");
+		}
+		else {
+			//System.out.println("***************************************Calculated**");
+		}
+		
+//		if(symbol.equals("X")) {
+//			decision = rand_avail_pos;
+//		}
+		
+		//System.out.println("DESICION?????????????????????   " + decision);
+		
+		
+		buildTree(decision,future_grid);
+		
+		updateValueonGrid(grid, decision);
+
+		//set future status to current children
+	
+	}
+	
+	public int calculateBestPosition() {
+		
+		SavingStates ss = new SavingStates(grid, wr, path, -1);
+
+		int best = 0;
+		try {
+			best = ss.getBestChild(symbol);
+		} catch (IOException | ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return best;
+	}
+	
+	public void buildTree(int rand_avail_pos,Grid future_grid) {
+		
+		updateValueonGrid(future_grid, rand_avail_pos);
 		
 		SavingStates savingStates = new SavingStates(grid, wr, path, rand_avail_pos);
 		
-		boolean futureStateExists = savingStates.checkIfFutureStateExists(future_grid);
+		boolean futureStateExists = savingStates.checkIfStateFileExists(future_grid);
 		
-
 		try {
-			
 			savingStates.addChildrenToCurrentFile(grid,future_grid);
 			//savingStates.setStatusOfChildToFutureResult(grid,future_grid);
 	        
@@ -88,13 +126,7 @@ public class R2D2 extends Player{
 				//check children and if if any children are L set result to L, then T and then W. L>T>W
 			//If results is L, choose a different position
 			
-			
-
 		}
-		updateValueonGrid(grid, rand_avail_pos);
-
-		//set future status to current children
-	
 	}
 	
 	public void updateValueonGrid(Grid grid, int rand_avail_pos) {
@@ -155,7 +187,7 @@ public class R2D2 extends Player{
 		Random rand = new Random();
 		int random_index = rand.nextInt(availables.length);//0->(n-1)
 		
-		System.out.println("random:" + availables[random_index]);
+		//System.out.println("random:" + availables[random_index]);
 		
 		return availables[random_index];
 	}
