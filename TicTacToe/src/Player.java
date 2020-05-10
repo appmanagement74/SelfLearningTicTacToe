@@ -23,7 +23,7 @@ public abstract class Player {
 	
 	public String getOpponentSymbol() {
 		
-		if(symbol == "X") {
+		if(symbol.equals("X")) {
 			return "O";
 		}	
 		return "X";

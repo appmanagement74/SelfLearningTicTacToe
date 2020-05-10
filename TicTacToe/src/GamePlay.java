@@ -116,7 +116,7 @@ public class GamePlay {
 		currentGameHash = grid.getGridHashCode();
 		
 		saveStateExternally();
-		grid.printGrid();
+		//grid.printGrid();
 
 	}
 	

@@ -46,7 +46,7 @@ public class R2D2 extends Player{
 
 		
 		int decision = calculateBestPosition();
-		
+				
 		if(decision <= 0) {
 			decision = rand_avail_pos;
 			//System.out.println("***************************************Random**");
@@ -55,16 +55,16 @@ public class R2D2 extends Player{
 			//System.out.println("***************************************Calculated**");
 		}
 		
-//		if(symbol.equals("X")) {
-//			decision = rand_avail_pos;
-//		}
+		if(symbol.equals("X")) {
+			decision = rand_avail_pos;
+		}
 		
 		//System.out.println("DESICION?????????????????????   " + decision);
 		
 		
 		buildTree(decision,future_grid);
 		
-		updateValueonGrid(grid, decision);
+		updateValueonGrid(grid, decision, symbol);
 
 		//set future status to current children
 	
@@ -72,6 +72,12 @@ public class R2D2 extends Player{
 	
 	public int calculateBestPosition() {
 		
+		int sabotage = sabotageOpponentsWin();
+		
+		if(sabotage > 0) {
+			return sabotage;
+		}
+
 		SavingStates ss = new SavingStates(grid, wr, path, -1);
 
 		int best = 0;
@@ -85,10 +91,43 @@ public class R2D2 extends Player{
 		return best;
 	}
 	
+	
+	public int sabotageOpponentsWin() {
+		
+		Grid future_grid;
+		
+		Integer[] avail_pos = grid.getAvailablePositions();
+		
+
+		String result = "";
+		
+		//System.out.println("//////////////");
+		
+		for(int i = 0; i < avail_pos.length; i++) {
+			
+			future_grid = grid.getGridCopy();
+			WinRules temp_wr = new WinRules(future_grid);
+
+			updateValueonGrid(future_grid, avail_pos[i], getOpponentSymbol());
+			result = temp_wr.checkGrid();
+			
+			//System.out.println("RESULT: " + result);
+
+			//System.out.println("SABOTAGED: " + getOpponentSymbol() + temp_wr.getWinMessage());
+
+			if(result.equals(getOpponentSymbol() + temp_wr.getWinMessage())) {
+				return  avail_pos[i];
+			}
+		}
+
+
+		return 0;
+	}
+	
 	public void buildTree(int rand_avail_pos,Grid future_grid) {
 		
-		updateValueonGrid(future_grid, rand_avail_pos);
-		
+		updateValueonGrid(future_grid, rand_avail_pos, symbol);
+				
 		SavingStates savingStates = new SavingStates(grid, wr, path, rand_avail_pos);
 		
 		boolean futureStateExists = savingStates.checkIfStateFileExists(future_grid);
@@ -129,7 +168,7 @@ public class R2D2 extends Player{
 		}
 	}
 	
-	public void updateValueonGrid(Grid grid, int rand_avail_pos) {
+	public void updateValueonGrid(Grid grid, int rand_avail_pos, String player_symbol) {
 		
 		int row = -1;
 		int col = -1;
@@ -176,7 +215,7 @@ public class R2D2 extends Player{
 				System.out.println("Error converting position available to row and column");
 		}
 		
-		grid.setSingleGridValue(row, col, symbol);
+		grid.setSingleGridValue(row, col, player_symbol);
 		grid. subtract1FromOpenPositionsAmt();
 	}
 	

@@ -29,9 +29,9 @@ public class TicTacToe{
 				ties_amt++;
 			}
 			
-//			System.out.println("Amount of X WINS: " + x_wins_amt);
-//			System.out.println("Amount of O WINS: " + o_wins_amt);
-//			System.out.println("Amount of TIES: " + ties_amt);
+			System.out.println("Amount of X WINS: " + x_wins_amt);
+			System.out.println("Amount of O WINS: " + o_wins_amt);
+			System.out.println("Amount of TIES: " + ties_amt);
 		}
 		
 		

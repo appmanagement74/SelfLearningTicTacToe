@@ -231,6 +231,23 @@ public class SavingStates{
         fileReader.close();
 	}
 	
+	
+	public int getRandomLocationFromParentNode(JSONObject child_value ) {
+		
+		int randomLoc = 0;
+		
+		if((child_value.get("Randomly chosen grid location").getClass().getSimpleName()).equals("long") ||
+				(child_value.get("Randomly chosen grid location").getClass().getSimpleName()).equals("Long")) {
+			
+			randomLoc =  (int) ((long)child_value.get("Randomly chosen grid location"));
+		}
+		else {
+			randomLoc =  (int) child_value.get("Randomly chosen grid location");
+		}
+		
+		return randomLoc;
+	}
+	
 	public void updateResult(JSONObject obj) {
 		
 		JSONObject children = (JSONObject) obj.get("children"); 
@@ -259,6 +276,14 @@ public class SavingStates{
 		int worst_child_o_pos = 0;
 		int worst_tie_pos = 0;
 		
+		String best_child_x_pos_key = ""; 
+		String best_child_o_pos_key = "";
+		String best_tie_pos_key = "";
+		
+		String worst_child_x_pos_key = ""; 
+		String worst_child_o_pos_key = "";
+		String worst_tie_pos_key = "";
+		
 		
 		int best_child_x_pos_prioritized = 0;
 		int best_child_o_pos_prioritized = 0;
@@ -274,7 +299,7 @@ public class SavingStates{
 		for(String child_key: all_children_keys) {
 			//need to access result values for each child
 		
-			
+			counter++;
 			JSONObject child_value = (JSONObject) children.get(child_key);
 			//System.out.println(child_value);
 			//counter++;
@@ -284,47 +309,108 @@ public class SavingStates{
 					&& child_value.get("Randomly chosen grid location") != null) {
 				
 				
-				counter++;
+				//counter++;
 				Double win_x = (double) child_value.get("win_percentage_for_player_X");
 				Double win_o = (double) child_value.get("win_percentage_for_player_O");
 				Double tie = (double) child_value.get("tie_percentage");
 				
 				
-				randomLoc = 0;
+				randomLoc = getRandomLocationFromParentNode(child_value);
 				
-				if((child_value.get("Randomly chosen grid location").getClass().getSimpleName()).equals("long") ||
-						(child_value.get("Randomly chosen grid location").getClass().getSimpleName()).equals("Long")) {
-					
-					randomLoc =  (int) ((long)child_value.get("Randomly chosen grid location"));
-				}
-				else {
-					randomLoc =  (int) child_value.get("Randomly chosen grid location");
-				}
+				
+				JSONObject old_child = null;
 				
 				if(win_x > win_x_max) {
 					win_x_max = win_x;
+					best_child_x_pos_key = child_key;
 					best_child_x_pos = randomLoc;
+				}
+				else if (win_x == win_x_max){
+					//check which one has worst O				
+					//if O is the same, tie percentage is the same
+					
+					old_child = (JSONObject) children.get(best_child_x_pos_key);
+					
+					if(old_child != null) {
+						if(old_child.get("win_percentage_for_player_O") != null) {
+							double old_win_o = (double) old_child.get("win_percentage_for_player_O");
+							
+							if(old_win_o < win_o) {
+								best_child_x_pos = getRandomLocationFromParentNode(old_child);
+							}
+						}
+					}
 				}
 				if(win_o > win_o_max) {
 					win_o_max = win_o;
+					best_child_o_pos_key = child_key;
 					best_child_o_pos = randomLoc;
 				}
+				else if(win_o == win_o_max){
+					
+					old_child = (JSONObject) children.get(best_child_o_pos_key);
+					
+					if(old_child != null) {
+						if(old_child.get("win_percentage_for_player_x") != null) {
+							double old_win_x = (double) old_child.get("win_percentage_for_player_x");
+							
+							if(old_win_x < win_x) {
+								best_child_o_pos = getRandomLocationFromParentNode(old_child);
+							}
+						}
+					}
+					
+				}
+				
 				if(tie > tie_max) {
 					tie_max = tie;
+					best_tie_pos_key = child_key;
 					best_tie_pos = randomLoc;
 				}
 				
 				
 				if(win_x < win_x_min) {
 					win_x_min = win_x;
+					worst_child_o_pos_key = child_key;
 					worst_child_x_pos = randomLoc;
+				}
+				else if(win_x == win_x_min){
+					
+					old_child = (JSONObject) children.get(best_child_x_pos_key);
+					
+					if(old_child != null) {
+						if(old_child.get("win_percentage_for_player_O") != null) {
+							double old_win_o = (double) old_child.get("win_percentage_for_player_O");
+							
+							if(old_win_o > win_o) {
+								worst_child_x_pos = getRandomLocationFromParentNode(old_child);
+							}
+						}
+					}
 				}
 				if(win_o < win_o_min) {
 					win_o_min = win_o;
+					worst_child_o_pos_key = child_key;
 					worst_child_o_pos = randomLoc;
 				}
+				else if(win_o == win_o_min) {
+					
+					old_child = (JSONObject) children.get(best_child_o_pos_key);
+					
+					if(old_child != null) {
+						if(old_child.get("win_percentage_for_player_x") != null) {
+							double old_win_x = (double) old_child.get("win_percentage_for_player_x");
+							
+							if(old_win_x > win_x) {
+								worst_child_o_pos = getRandomLocationFromParentNode(old_child);
+							}
+						}
+					}
+				}
+				
 				if(tie < tie_min) {
 					tie_min = tie;
+					worst_tie_pos_key = child_key;
 					worst_tie_pos = randomLoc;
 				}
 				
@@ -358,6 +444,12 @@ public class SavingStates{
 					worst_child_x_pos_prioritized = randomLoc;
 					worst_child_o_pos_prioritized = randomLoc;
 					worst_tie_pos_prioritized = randomLoc;
+					
+					
+					
+					parent_win_percentage_for_player_X = Double.MAX_VALUE;
+					parent_win_percentage_for_player_O = Double.MAX_VALUE;
+					parent_tie_percentage = Double.MAX_VALUE;
 					
 				}
 			}
