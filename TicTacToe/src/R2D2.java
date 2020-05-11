@@ -55,7 +55,9 @@ public class R2D2 extends Player{
 			//System.out.println("***************************************Calculated**");
 		}
 		
-		if(symbol.equals("X")) {
+		
+		//Makes symbol selected always choose a random position
+		if(symbol.equals("X") || symbol.equals("O")) {
 			decision = rand_avail_pos;
 		}
 		
@@ -72,12 +74,6 @@ public class R2D2 extends Player{
 	
 	public int calculateBestPosition() {
 		
-		int sabotage = sabotageOpponentsWin();
-		
-		if(sabotage > 0) {
-			return sabotage;
-		}
-
 		SavingStates ss = new SavingStates(grid, wr, path, -1);
 
 		int best = 0;
@@ -91,38 +87,6 @@ public class R2D2 extends Player{
 		return best;
 	}
 	
-	
-	public int sabotageOpponentsWin() {
-		
-		Grid future_grid;
-		
-		Integer[] avail_pos = grid.getAvailablePositions();
-		
-
-		String result = "";
-		
-		//System.out.println("//////////////");
-		
-		for(int i = 0; i < avail_pos.length; i++) {
-			
-			future_grid = grid.getGridCopy();
-			WinRules temp_wr = new WinRules(future_grid);
-
-			updateValueonGrid(future_grid, avail_pos[i], getOpponentSymbol());
-			result = temp_wr.checkGrid();
-			
-			//System.out.println("RESULT: " + result);
-
-			//System.out.println("SABOTAGED: " + getOpponentSymbol() + temp_wr.getWinMessage());
-
-			if(result.equals(getOpponentSymbol() + temp_wr.getWinMessage())) {
-				return  avail_pos[i];
-			}
-		}
-
-
-		return 0;
-	}
 	
 	public void buildTree(int rand_avail_pos,Grid future_grid) {
 		

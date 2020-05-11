@@ -66,6 +66,46 @@ public class GamePlay {
 			return check_grid;
 	}
 	
+	public String PlayervsR2D2() {
+		
+
+		Player r2d2 =  new R2D2(grid,wr, o,path);
+		Player user_2 = new User(grid,x,sc,wr,path);
+
+		
+		String check_grid = "";
+		
+		saveAndPrintGrid();
+
+		while(grid.getOpenPositionsAmt() > 0) {
+			
+			((User) user_2).play(previousGameHash,currentGameHash);
+			saveAndPrintGrid();
+			
+			check_grid = wr.checkGrid();
+			if(!check_grid.equals("")) {
+				System.out.println(check_grid);
+			}
+			if(wr.getGameHasEnded()) {
+				return check_grid;
+			}
+			
+			((R2D2) r2d2).play(previousGameHash,currentGameHash);
+			saveAndPrintGrid();
+			
+			check_grid = wr.checkGrid();
+			if(!check_grid.equals("")) {
+				System.out.println(check_grid);
+			}
+			if(wr.getGameHasEnded()) {
+				return check_grid;
+			}
+			
+		}
+		sc.close();
+		return check_grid;
+}
+	
 	public String R2D2vsR2D2() {
 		
 
@@ -116,7 +156,7 @@ public class GamePlay {
 		currentGameHash = grid.getGridHashCode();
 		
 		saveStateExternally();
-		//grid.printGrid();
+		grid.printGrid();
 
 	}
 	

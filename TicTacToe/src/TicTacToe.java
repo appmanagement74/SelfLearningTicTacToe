@@ -12,6 +12,10 @@ public class TicTacToe{
 		GamePlay gamePlay = new GamePlay();
 		//gamePlay.R2D2vsPlayer();
 		
+//		for(int i = 0; i < 3; i++) {
+//			gamePlay.PlayervsR2D2();
+//		}
+		
 				
 		for(int i = 0; i < 10000; i++) {
 			GamePlay gamePlay2 = new GamePlay();
@@ -27,12 +31,11 @@ public class TicTacToe{
 			}
 			else {
 				ties_amt++;
-			}
-			
-			System.out.println("Amount of X WINS: " + x_wins_amt);
-			System.out.println("Amount of O WINS: " + o_wins_amt);
-			System.out.println("Amount of TIES: " + ties_amt);
+			}	
 		}
+		System.out.println("Amount of X WINS: " + x_wins_amt);
+		System.out.println("Amount of O WINS: " + o_wins_amt);
+		System.out.println("Amount of TIES: " + ties_amt);
 		
 		
 
