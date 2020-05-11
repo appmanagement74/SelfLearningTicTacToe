@@ -6,10 +6,17 @@ public class TicTacToe{
 	private static int o_wins_amt = 0;
 	private static int ties_amt = 0;
 	private static WinRules wr = new WinRules();
+	private static String path = "/Volumes/TICTACTOE/TicTacToeStates/";
 	
+	
+	/**  
+	 * main method used for running the different combinations or User and Bot games
+	 * @param terminal input arguments not used in eclipse
+	 * @return none
+	 */
 	public static void main(String[] args) {
 		
-		GamePlay gamePlay = new GamePlay();
+		GamePlay gamePlay = new GamePlay(path);
 		//gamePlay.R2D2vsPlayer();
 		
 //		for(int i = 0; i < 3; i++) {
@@ -18,7 +25,7 @@ public class TicTacToe{
 		
 				
 		for(int i = 0; i < 10000; i++) {
-			GamePlay gamePlay2 = new GamePlay();
+			GamePlay gamePlay2 = new GamePlay(path);
 
 			String result = gamePlay2.R2D2vsR2D2();
 			

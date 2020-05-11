@@ -9,7 +9,12 @@ public abstract class Player {
 	String path;
 
 	
-	
+	/**  
+	 * Constructor for Player Class
+	 * @param Tic-Tac-Toe board, Symbol of player (X or 0),
+	 *  game rules instance, path of where the JSON nodes/states will be saved
+	 * @return none
+	 */
 	Player(Grid grid, String symbol, WinRules wr,String path){
 		
 		this.grid = grid;
@@ -19,6 +24,11 @@ public abstract class Player {
 		opponentSymbol = getOpponentSymbol();
 	}
 	
+	/**  
+	 * Abstact method play() that the User and Bot classes have to define
+	 * @param none
+	 * @return none
+	 */
 	public abstract void play(String previousGameHash,String currentGameHash);
 	
 	public String getOpponentSymbol() {

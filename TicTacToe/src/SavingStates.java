@@ -20,6 +20,13 @@ public class SavingStates{
     private static int rand_avail_pos;
     private double default_percent = 0.0;
 	
+    
+    /**  
+	 * Constructor for SavingStates Class
+	 * @param grid(Tic-Tac-Toe board),wr(game rules instance), path( path of where the JSON nodes/states will be saved), 
+	 * rand_avail_pos(randomly generated or calculated board position)
+	 * @return none
+	 */
 	SavingStates(Grid grid, WinRules wr,String path, int rand_avail_pos){
 		
 		this.grid = grid;
@@ -28,6 +35,11 @@ public class SavingStates{
 		this.rand_avail_pos = rand_avail_pos;
 	}
 	
+	/**  
+	 * Constructor for SavingSates Class without rand_avail_pos(randomly generated or calculated board position)
+	 * @param grid(Tic-Tac-Toe board),wr(game rules instance), path( path of where the JSON nodes/states will be saved)
+	 * @return none
+	 */
 	SavingStates(Grid grid, WinRules wr,String path){
 		
 		this.grid = grid;
@@ -35,12 +47,17 @@ public class SavingStates{
 		this.path = path;
 	}
 	
+	/**  
+	 * Checks if JSON file for current game state exists,
+	 * 		if no, it creates it
+	 *		if yes, it increments the JSON state files counter for amount of visits
+	 * @param none
+	 * @return none
+	 */
 	public void createCurrentGridStateJSON() throws ParseException, IOException {
 		
 		File file = new File(path, grid.getGridHashCode() + ".json");
         boolean exists = file.exists();
-        //System.out.println("exits:" + exists);
-        
 	
 		if(!exists) {
 	        FileWriter fileWriter = new FileWriter(file);
@@ -54,18 +71,17 @@ public class SavingStates{
 			
 			FileReader fileReader = new FileReader(file);
 
-			//System.out.println("test1.1");
 			readAndReplaceGameStateFields(fileReader, file);
 			fileReader.close();
-
 		}
 	}
 	
+	/**  
+	 * Increments the visited counter of the received JSON state file
+	 * @param none
+	 * @return none
+	 */
 	public void readAndReplaceGameStateFields(FileReader fileReader, File file) throws IOException, ParseException {
-			
-		//System.out.println("test1.2");
-
-		//System.out.println("test1.3");
 
         JSONParser parser = new JSONParser();
         
@@ -83,10 +99,14 @@ public class SavingStates{
 
         fileWriter.flush();
     	fileWriter.close();
-        
-        //System.out.println("counter:" + counter);
 	}
 	
+	/**  
+	 * Creates JSON state file for current Tic-Tac-Toe Board/Grid. If current game state is an end to the game,
+	 * win lose and tie probability attributes are set to 100% or 0% depending on how the game ended. 
+	 * @param fileWriter object (to write Board/Grid values on JSON file)
+	 * @return none
+	 */
 	public void createGameStateFile(FileWriter fileWriter) throws IOException {
 		
 		JSONObject gameState = new JSONObject();
@@ -152,6 +172,11 @@ public class SavingStates{
 		fileWriter.write(gameState.toString());
 	}
 	
+	/**  
+	 * Checks if a JSON state file exist for Grid/Tic-Tac-Toe board state passed in
+	 * @param Grid object
+	 * @return boolean showing whether passed in grid exists as a JSON file
+	 */
 	public boolean checkIfStateFileExists(Grid future_grid) {
 		
 		File future_file = new File(path, future_grid.getGridCopy().getGridHashCode() + ".json");
@@ -161,6 +186,13 @@ public class SavingStates{
         return exists;
 	}
 	
+	/**  
+	 * Adds children objects to current Grid state JSON file. Sets a Priority attribute to children that don't
+	 * lead to an end game (X winning, O winning, Trying). If children lead to an end game, probability values are set 
+	 * to 100% for the result(X Winning, O Winning or Tie) and 0% for what did not occur)
+	 * @param current_grid (Current Tic-Tac-Toe board state) future_grid ("Future" Tic-Tac-Toe board state)
+	 * @return none
+	 */
 	public void addChildrenToCurrentFile(Grid current_grid, Grid future_grid) throws IOException, ParseException {
 		
 		//instead of undetermined, set hashcode value to future result value
@@ -173,22 +205,15 @@ public class SavingStates{
         
 		
 		JSONObject obj = (JSONObject) parser.parse(fileReader);
-		
-		//System.out.println((obj.get("children")).getClass().getName());
-        
+		        
 		JSONObject children = (JSONObject) obj.get("children"); 
 
         WinRules future_result = new WinRules(future_grid);
-        
-        //System.out.println("future: " + future_result.checkGrid());
-        
+                
         JSONObject child = new JSONObject();
     	String f_result = future_result.checkGrid();
 
         if(f_result.equals("")) {
-//        	child.put("win_percentage_for_player_X", default_percent);
-//			child.put("win_percentage_for_player_O", default_percent);
-//			child.put("tie_percentage", default_percent);
         	
         	child.put("Randomly chosen grid location", rand_avail_pos);//this works
             child.put("Priority", true);
@@ -212,8 +237,6 @@ public class SavingStates{
 				child.put("win_percentage_for_player_O", 0.0);
 				child.put("tie_percentage", 100.0);
 			}
-        	//child.put("Randomly chosen grid location", -1);
-
             children.put(future_grid.getGridCopy().getGridHashCode(), child);
         }
         
@@ -232,6 +255,11 @@ public class SavingStates{
 	}
 	
 	
+	/**  
+	 * Gets the Grid/Tic-Tac-Toe board position from the child of a JSON file.
+	 * @param child_value (child object from a JSON state file)
+	 * @return randomLoc(Grid/Tic-Tac-Toe board position from the child of a JSON file) 
+	 */
 	public int getRandomLocationFromParentNode(JSONObject child_value ) {
 		
 		int randomLoc = 0;
@@ -248,6 +276,13 @@ public class SavingStates{
 		return randomLoc;
 	}
 	
+	/**  
+	 * Checks every child, of JSON state file, and calculates the average probability of X winning, O winning 
+	 * and Tying and updates its attributes. It also sets the probability of unvisited children nodes to the max integer value, so
+	 * that they have priority in being chosen. 
+	 * @param JSON Object representing current state JSON FIle
+	 * @return none
+	 */
 	public void updateResult(JSONObject obj) {
 		
 		JSONObject children = (JSONObject) obj.get("children"); 
@@ -499,6 +534,12 @@ public class SavingStates{
 	
 	}
 	
+	/**  
+	 * Updates the children of the current Grid JSON state file, so that they reflect correct the "Future" grid
+	 * JSON state files they point to. Priority for child visitation is set to true, if future file doesn't exist.
+	 * @param current_grid (current Tic-Tac-Toe board game state), future_grid (future Tic-Tac-Toe board game state)
+	 * @return none
+	 */
 	public void updateChildrenResults(Grid current_grid, Grid future_grid) throws IOException, ParseException {
 		
 		//instead of undetermined, set hashcode value to future result value
@@ -516,7 +557,6 @@ public class SavingStates{
 		JSONParser parser2 = new JSONParser();
 
         
-		
 		JSONObject obj = (JSONObject) parser.parse(fileReader);
 		JSONObject obj2 = (JSONObject) parser2.parse(fileReader2);
 
@@ -526,8 +566,6 @@ public class SavingStates{
         
         JSONObject child = new JSONObject();
         
-        //System.out.println("children: " + obj.get("children"));
-
         
         if(obj2.get("win_percentage_for_player_X") != null 
         		&&  obj2.get("win_percentage_for_player_O") != null
@@ -548,14 +586,11 @@ public class SavingStates{
         child.put("Randomly chosen grid location", rand_avail_pos);
 
         
-		
         children.put(future_hash,child);
         obj.put("children", children);
         
         updateResult(obj);
         
-        //System.out.println("children2: " + obj.get("children"));
-
         
         FileWriter fileWriter = new FileWriter(file);
 		fileWriter.write(obj.toString());
@@ -566,31 +601,12 @@ public class SavingStates{
         fileReader.close();
         fileReader2.close();
 	}
-		
-	public void checkChildrenUpdateResult() throws IOException, ParseException {
-		
-		File file = new File(path, grid.getGridCopy().getGridHashCode() + ".json");
-		
-		FileReader fileReader = new FileReader(file);
-		
-		JSONParser parser = new JSONParser();
-        
-		Object obj = parser.parse(fileReader);
-		
-		JSONObject jo = (JSONObject) obj; 
-        
-        JSONObject children = (JSONObject) jo.get("children"); 
-        
-        JSONArray key = (JSONArray) children.keySet();
-
-        for(int i = 0; i < ((CharSequence) key).length(); i++) {
-        	
-        	String future_result = (String) children.get(key);
-        	//System.out.println("future results: " + future_result);
-        }
-
-	}
 	
+	/**  
+	 * locates child with best possibility of winning(or in some cases tying)
+	 * @param Symbol(Symbol of player( X or O))
+	 * @return integer position value of child with best chances of winning.
+	 */
 	public int getBestChild(String symbol) throws IOException, ParseException {
 		
 		

@@ -8,22 +8,34 @@ public class GamePlay {
 	private Grid grid;
 	private Scanner sc;
 	private WinRules wr;
-	
 	private String previousGameHash;
 	private String currentGameHash;
 	private String path;
 	private String x = "X";
 	private String o = "O";
 
-	GamePlay(){
+	
+	/**  
+	 * Constructor for GamePlay Class
+	 * @param String path for directory where 
+	 * JSON files(tree nodes/game states) will be stored.
+	 * @return none
+	 */
+	GamePlay(String path){
 		
 		grid = new Grid();
 		sc = new Scanner(System.in);
 		wr = new WinRules(grid);
-		path = "/Volumes/TICTACTOE/TicTacToeStates/";
+		this.path = path;
 		
 	}
 	
+	/**  
+	 * Bot VS Player method used to Start the Tic-Tact-Toe game with the Bot(X) 
+	 * followed by the User(O)
+	 * @param none
+	 * @return the winner of the game in a String
+	 */
 	public String R2D2vsPlayer() {
 		
 
@@ -66,6 +78,12 @@ public class GamePlay {
 			return check_grid;
 	}
 	
+	/**  
+	 * Player VS Bot method used to Start the Tic-Tact-Toe game with the Player(X) 
+	 * followed by the Bot(O)
+	 * @param none
+	 * @return the winner of the game in a String
+	 */
 	public String PlayervsR2D2() {
 		
 
@@ -106,6 +124,12 @@ public class GamePlay {
 		return check_grid;
 }
 	
+	/**  
+	 * Bot VS Bot method used to Start the Tic-Tact-Toe game with the Bot(X) 
+	 * followed by the Bot(O)
+	 * @param none
+	 * @return the winner of the game in a String
+	 */
 	public String R2D2vsR2D2() {
 		
 
@@ -141,15 +165,17 @@ public class GamePlay {
 			if(wr.getGameHasEnded()) {
 				return check_grid;
 			}
-
 		}
 		sc.close();
 		return check_grid;
-
 }
 	
-	
-	
+	/**  
+	 * Saves the current State of the Tic-Tac-Toe Board externally in a JSON file, using helper method, and
+	 * prints the Grid on the Console
+	 * @param none
+	 * @return none
+	 */
 	public void saveAndPrintGrid() {
 		
 		previousGameHash = currentGameHash;
@@ -160,6 +186,11 @@ public class GamePlay {
 
 	}
 	
+	/**  
+	 * Helper method used to store current state of Tic-Tac_Toe board externally in a JSON File.
+	 * @param none
+	 * @return none
+	 */
 	public void saveStateExternally() {
 		
 		SavingStates ss = new SavingStates(grid,wr, path);

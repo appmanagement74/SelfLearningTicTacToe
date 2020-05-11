@@ -6,6 +6,11 @@ public class WinRules {
 	private String win_message;
 	private String tie_message;
 	
+	/**  
+	 * Overloaded Constructor for WinRules Class
+	 * @param grid(Gird object representing Tic-Tac-Toe board)
+	 * @return none
+	 */
 	WinRules(Grid grid){
 		this.grid = grid;
 		game_has_ended = false;
@@ -13,12 +18,22 @@ public class WinRules {
 		tie_message = "Tie!";
 	}
 	
+	/**  
+	 * Constructor for WinRules Class
+	 * @param none
+	 * @return none
+	 */
 	WinRules(){
 		game_has_ended = false;
 		win_message = " Wins!";
 		tie_message = "Tie!";
 	}
 	
+	/**  
+	 * Overloaded Constructor for WinRules Class
+	 * @param grid(Gird object representing Tic-Tac-Toe board)
+	 * @return none
+	 */
 	public String checkGrid() {
 		
 		if(grid.getOpenPositionsAmt() <= 0) {
@@ -50,6 +65,12 @@ public class WinRules {
 		
 	}
 	
+	/**  
+	 * Checks if there is any symbol that makes a 3 position diagonal connection
+	 * @param none
+	 * @return the Symbol (Symbol of Player (X or O)) in String that makes a 3 point diagonal connection, or 
+	 * and empty string if no diagonal connection is made
+	 */
 	public String checkDiagonal() {
 		
 		String r1c1 = grid.getGrid()[0][0];
@@ -66,10 +87,15 @@ public class WinRules {
 			return r1c3;
 		}
 		
-		
 		return "";
 	}
 	
+	/**  
+	 * Checks if there is any symbol that makes a 3 position horizontal connection
+	 * @param none
+	 * @return the Symbol (Symbol of Player (X or O)) in String that makes a 3 point horizontal connection, or 
+	 * and empty string if no horizontal connection is made
+	 */
 	public String checkHorizonal() {
 		
 		String r1c1 = grid.getGrid()[0][0];
@@ -98,6 +124,12 @@ public class WinRules {
 		return "";
 	}
 	
+	/**  
+	 * Checks if there is any symbol that makes a 3 position Vertical connection
+	 * @param non
+	 * @return the Symbol (Symbol of Player (X or O)) in String that makes a 3 point vertical connection, or 
+	 * and empty string if no vertical connection is made
+	 */
 	public String checkVertical() {
 		
 		String r1c1 = grid.getGrid()[0][0];
@@ -125,15 +157,30 @@ public class WinRules {
 		return "";
 	}
 	
+	/**  
+	 * Accessor method for game_has_ended attribute
+	 * @param none
+	 * @return none
+	 */
 	public boolean getGameHasEnded() {
 		return game_has_ended;
 	}
 	
+	/**  
+	 * Accessor method for win_message attribute
+	 * @param none
+	 * @return none
+	 */
 	public String getWinMessage() {
 		
 		return win_message;
 	}
 	
+	/**  
+	 * Accessor method for tie_message attribute
+	 * @param none
+	 * @return none
+	 */
 	public String getTieMessage() {
 		return tie_message;
 	}

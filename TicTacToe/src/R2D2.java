@@ -1,24 +1,32 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
 
 public class R2D2 extends Player{
 	
 	String previousGameHash;
 	String currentGameHash;
 	
+	/**  
+	 * Constructor for Bot Class
+	 * @param Tic-Tac-Toe board,game rules instance, Symbol of player (X or 0),
+	 *  path of where the JSON nodes/states will be saved
+	 * @return none
+	 */
 	R2D2(Grid grid, WinRules wr, String symbol, String path){
 		super(grid,symbol,wr,path);
 	
 	}
 
+	/**  
+	 * Increments the turn counter and initializes attributes with previous and current state SHA256 hash. 
+	 * @param String path for directory where 
+	 * JSON files(tree nodes/game states) will be stored.
+	 * @return none
+	 */
+	@Override
 	public void play(String previousGameHash,String currentGameHash) {
 		
 		turns_taken++;
@@ -28,10 +36,16 @@ public class R2D2 extends Player{
 		AnalyzeBoard();
 	}
 	
-	
+	/**  
+	 * Generates random position from Tic-Tac-Toe board. Checks previous saved game states and replaces 
+	 * randomly selected position if a better decision/choice exists. It then makes the decision, saves the new 
+	 * 
+	 * @param String path for directory where 
+	 * JSON files(tree nodes/game states) will be stored.
+	 * @return none
+	 */
 	public void AnalyzeBoard() {
-		
-		
+			
 		//1.check one State(hashCode) ahead 
 		//2. Check if the future State file already exist
 		//2a. If future State doesn't exist, add future State Hash to Current State file under possibilities array
@@ -43,35 +57,29 @@ public class R2D2 extends Player{
 		int rand_avail_pos = getRandomAvailablePosition();
 
 		Grid future_grid = grid.getGridCopy();
-
-		
+	
 		int decision = calculateBestPosition();
 				
 		if(decision <= 0) {
 			decision = rand_avail_pos;
-			//System.out.println("***************************************Random**");
-		}
-		else {
-			//System.out.println("***************************************Calculated**");
 		}
 		
-		
-		//Makes symbol selected always choose a random position
-		if(symbol.equals("X") || symbol.equals("O")) {
-			decision = rand_avail_pos;
-		}
-		
-		//System.out.println("DESICION?????????????????????   " + decision);
-		
+//		//Makes symbol selected always choose a random position
+//		if(symbol.equals("X") || symbol.equals("O")) {
+//			decision = rand_avail_pos;
+//		}
 		
 		buildTree(decision,future_grid);
 		
 		updateValueonGrid(grid, decision, symbol);
-
-		//set future status to current children
-	
 	}
 	
+	/**  
+	 * Checks previous data (JSON files/tree nodes) and return the best position with 
+	 * the greatest probability of success if it exists
+	 * @param none
+	 * @return Tic-Tac-Toe position with greatest probability of success
+	 */
 	public int calculateBestPosition() {
 		
 		SavingStates ss = new SavingStates(grid, wr, path, -1);
@@ -87,7 +95,19 @@ public class R2D2 extends Player{
 		return best;
 	}
 	
-	
+	/**  
+	 * Updates a copy of the current Tic-Tac-Toe game with the decision made which results in a "Future" 
+	 * Tic-Tac-Toe game board. It then check if the "Future" state JSON file exists by checking the files in
+	 * the path provided. The SHA256 Hash code representing the "Future" grid is then added as a child object
+	 * to the current state JSON file with default win, tie, and lose probabilities. If the "Future" state Hash Code
+	 * is found, as the name of one of the files, then the win, tie and lose probabilities saved in the "Future" JSON file 
+	 * are updated on the children of the current state JSON file that point to the "Future" file.
+	 * 
+	 * @param rand_avail_pos(can be randomly generated or calculated position), 
+	 * future_grida(copy of current Tic-Tac-Toe board before getting updated)
+	 *
+	 * @return none
+	 */
 	public void buildTree(int rand_avail_pos,Grid future_grid) {
 		
 		updateValueonGrid(future_grid, rand_avail_pos, symbol);
@@ -98,17 +118,14 @@ public class R2D2 extends Player{
 		
 		try {
 			savingStates.addChildrenToCurrentFile(grid,future_grid);
-			//savingStates.setStatusOfChildToFutureResult(grid,future_grid);
 	        
 		} catch (IOException | ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	
 		 if(futureStateExists) {
 			
-			//update children results  to next node result field or else it be set to undetermined 
+			//update children probabilities  to next node probabilities or else they will  be set to default values
 			 
 			try {
 				savingStates.updateChildrenResults(grid,future_grid);
@@ -120,18 +137,18 @@ public class R2D2 extends Player{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			//use previous data to either allow the random value update or generate another random value.
-			//2b. If future State exist, check whether it'll lead to a win
-			//3. If future State, doesn't lead to win, check another future State
-			//4. Move to future state
-			
-			//if result is undetermined
-				//check children and if if any children are L set result to L, then T and then W. L>T>W
-			//If results is L, choose a different position
-			
 		}
 	}
 	
+	/**  
+	 * Converts Tic-Tac-Toe board position integer (1-9) to row and column values. It
+	 * then updates the 2D array, representing the board, with the new move and subtracts 1
+	 * from the attribute holding the amount of available positions.
+	 * 
+	 * @param grid(current Tic-Tac-Toe board), rand_avail_pos(calculated or randomly generated available
+	 * position), player_symbol (Symbol of current player)
+	 * @return none
+	 */
 	public void updateValueonGrid(Grid grid, int rand_avail_pos, String player_symbol) {
 		
 		int row = -1;
@@ -183,15 +200,18 @@ public class R2D2 extends Player{
 		grid. subtract1FromOpenPositionsAmt();
 	}
 	
+	/**  
+	 * Generates a random value based on available Tic-Tac_tie board positions
+	 * @param none
+	 * @return randomly generated Tic-Tac-Toe position based on available positions
+	 */
 	public int getRandomAvailablePosition() {
 		
 		Integer[] availables = grid.getAvailablePositions();
 		
 		Random rand = new Random();
 		int random_index = rand.nextInt(availables.length);//0->(n-1)
-		
-		//System.out.println("random:" + availables[random_index]);
-		
+				
 		return availables[random_index];
 	}
 }
