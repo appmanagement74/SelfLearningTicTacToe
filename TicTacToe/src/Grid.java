@@ -88,9 +88,14 @@ public class Grid {
 		
 		game_grid[row][col] = value;
 	
-		int index = (row * col_size) + col;
+		int index = rowAndColToIndex(row, col);
 		positions[index] = -1;
 	}
+	
+	public int rowAndColToIndex(int row, int col) {
+		return (row * col_size) + col;
+	}
+
 	
 	/**  
 	 * Searches board to acquire all available positions on the Tic-Tac-Toe board.
@@ -318,4 +323,11 @@ public class Grid {
 		this.open_position_amt = open_position_amt;
 	}
 	
+	public int getColSize() {
+		return col_size;
+	}
+	
+	public int getRowSize() {
+		return row_size;
+	}
 }

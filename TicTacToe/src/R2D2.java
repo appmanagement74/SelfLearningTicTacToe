@@ -84,6 +84,12 @@ public class R2D2 extends Player{
 		
 		SavingStates ss = new SavingStates(grid, wr, path, -1);
 
+		int sabotage = sabotageOpponentIfOpponentAboutToWin();
+		System.out.println("SABOTAGE: " + sabotage);
+		if(sabotage > 0) {
+			return sabotage;
+		}
+		
 		int best = 0;
 		try {
 			best = ss.getBestChild(symbol);
@@ -94,6 +100,37 @@ public class R2D2 extends Player{
 		
 		return best;
 	}
+	
+	//returns a position where the opponent will win if not blocked, 0 if it doesnt exist
+	private int sabotageOpponentIfOpponentAboutToWin(){
+		
+		Grid grid_temp = grid.getGridCopy();
+		WinRules wr_temp = new WinRules(grid_temp);
+		
+		for(int i = 0; i < grid_temp.getRowSize(); i++) {
+			for(int j = 0; j < grid_temp.getColSize(); j++) {
+				if(grid_temp.getGrid()[i][j] == grid_temp.getDefaultValue()) {//if location empty
+					//System.out.println("Opponent Symbol: " + getOpponentSymbol());
+					grid_temp.setSingleGridValue(i,j,getOpponentSymbol());
+					
+//					System.out.println("****************************************");
+//					System.out.println("opponent result: " + wr_temp.checkGrid());
+//					grid_temp.printGrid();
+//					System.out.println("****************************************");
+
+					if((wr_temp.checkGrid()).equals(opponentSymbol + wr.getWinMessage())) {
+						//System.out.println("Sabotage - opponent win position returned");
+						grid_temp.setSingleGridValue(i,j,grid.getDefaultValue());
+						//return grid.getGrid()[i][j];
+						return grid_temp.rowAndColToIndex(i,j) + 1;
+					}
+					grid_temp.setSingleGridValue(i,j,grid.getDefaultValue());
+				}
+			}
+		}
+		return 0;
+	}
+
 	
 	/**  
 	 * Updates a copy of the current Tic-Tac-Toe game with the decision made which results in a "Future" 
